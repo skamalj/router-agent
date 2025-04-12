@@ -79,6 +79,7 @@ Resources:
               - dynamodb:Scan
               - dynamodb:Query
               - dynamodb:UpdateTimeToLive
+              - dynamodb:DescribeTable
             Resource: "*" # Allow access to all tables in this account
         - Statement:
           - Effect: Allow
