@@ -24,7 +24,7 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: "RouterQueue"
-      VisibilityTimeout: 30  # Ensure timeout is greater than Lambda execution time
+      VisibilityTimeout: 60  # Ensure timeout is greater than Lambda execution time
       MessageRetentionPeriod: 86400  # 1 day
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt RouterDeadLetterQueue.Arn
