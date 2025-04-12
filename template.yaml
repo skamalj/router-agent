@@ -24,7 +24,7 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: "RouterQueue"
-      VisibilityTimeout: 30  # Ensure timeout is greater than Lambda execution time
+      VisibilityTimeout: 60  # Ensure timeout is greater than Lambda execution time
       MessageRetentionPeriod: 86400  # 1 day
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt RouterDeadLetterQueue.Arn
@@ -38,14 +38,14 @@ Resources:
       MessageRetentionPeriod: 1209600  # Retain messages for 14 days
 
   # Lambda Function
-  RouteAgentrFunction:
+  RouterAgentFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: router/
       Handler: app.lambda_handler
       Runtime: python3.10
       MemorySize: 512
-      Timeout: 60
+      Timeout: 30
       Architectures:
         - x86_64
       Environment:
@@ -72,6 +72,14 @@ Resources:
         - Statement:
             Effect: Allow
             Action:
+              - dynamodb:CreateTable
+              - dynamodb:DeleteTable
+              - dynamodb:DescribeTable
+              - dynamodb:UpdateTable
+            Resource: "*"
+        - Statement:
+            Effect: Allow
+            Action:
               - dynamodb:PutItem
               - dynamodb:UpdateItem
               - dynamodb:DeleteItem
@@ -79,6 +87,7 @@ Resources:
               - dynamodb:Scan
               - dynamodb:Query
               - dynamodb:UpdateTimeToLive
+              - dynamodb:DescribeTable
             Resource: "*" # Allow access to all tables in this account
         - Statement:
           - Effect: Allow

@@ -103,9 +103,13 @@ def lambda_handler(event, context):
         }
 
         config = {"configurable": {"thread_id": profile_id}}
-        nextagent = app.invoke(input_message, config)
+        response = app.invoke(input_message, config)
+        nextagent = response["messages"][-1].content
+        
         print(f"Next agent: {nextagent}")
+        nextagent = json.loads(nextagent).get("agent_name", "awsagent")
         response = {
+            "fromagent": "router-agent",
             "nextagent": nextagent,
             "message": message,
             "thread_id": profile_id,

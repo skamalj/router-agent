@@ -24,13 +24,9 @@ There are two agents available:
 - For AWS-related or general-purpose queries, choose `awsagent`.
 
 **Output format:**
-```text
-sfagent
+{
+"agent_name" : <sfagent or awsagent>
+}
 ```
-or
-```text
-awsagent
-```
-
 No explanations. Just return the agent name.
 ```
