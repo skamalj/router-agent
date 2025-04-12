@@ -89,11 +89,11 @@ Resources:
               - sqs:GetQueueAttributes
             Resource: !GetAtt RouterQueue.Arn
         - Statement:
-          Effect: Allow
-          Action:
-            - states:StartExecution
-            - states:DescribeExecution
-          Resource: !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:AgentStepFunction"
+          - Effect: Allow
+            Action:
+              - states:StartExecution
+              - states:DescribeExecution
+            Resource: !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:AgentStepFunction"
 
 Outputs:
 
