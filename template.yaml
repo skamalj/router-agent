@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  computeagent
+
+  SAM Template for computeagent with SQS trigger
+
+Globals:
+  Function:
+    Timeout: 30  # Increased timeout since SQS processing may take longer
+
+Parameters:
+  ApiGWKey:
+    Type: String
+    Default: "ApiGWKey"
+    Description: "Name of the secret in AWS Secrets Manager"
+  ApiGWEndpoint:
+    Type: String
+    Default: "ApiGWEndpoint"
+    Description: "Name of the secret in AWS Secrets Manager"
+Resources:
+  # SQS Queue
+  RouterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: "RouterQueue"
+      VisibilityTimeout: 30  # Ensure timeout is greater than Lambda execution time
+      MessageRetentionPeriod: 86400  # 1 day
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt RouterDeadLetterQueue.Arn
+        maxReceiveCount: 5
+
+  # Dead Letter Queue (DLQ) for SQS
+  RouterDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: "RouterDeadLetterQueue"
+      MessageRetentionPeriod: 1209600  # Retain messages for 14 days
+
+  # Lambda Function
+  RouteAgentrFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: router/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      MemorySize: 512
+      Timeout: 60
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          MODEL_NAME: "gpt-4o"
+          PROVIDER_NAME: "openai"
+          MSG_HISTORY_TO_KEEP: 20
+          DELETE_TRIGGER_COUNT: 30
+          STEP_FUNCTION_ARN: !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:AgentStepFunction"
+          ROUTER_QUEUE_URL: !Ref LokiToJarvisQueue
+          API_GW_URL: !Sub "{{resolve:secretsmanager:${ApiGWEndpoint}}}"
+          API_GW_KEY: !Sub "{{resolve:secretsmanager:${ApiGWKey}}}"
+      Events:
+        SQSMessage:
+          Type: SQS
+          Properties:
+            Queue: !Sub "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:UnifiedChannelQueue"
+            BatchSize: 1  # Adjust based on workload (max 10)
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy: 
+            SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${ApiGWKey}-*"
+        - AWSSecretsManagerGetSecretValuePolicy: 
+            SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${ApiGWEndpoint}-*"
+        - Statement:
+            Effect: Allow
+            Action:
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+              - dynamodb:GetItem
+              - dynamodb:Scan
+              - dynamodb:Query
+              - dynamodb:UpdateTimeToLive
+            Resource: "*" # Allow access to all tables in this account
+        - Statement:
+          - Effect: Allow
+            Action:
+              - sqs:SendMessage
+              - sqs:ReceiveMessage
+              - sqs:DeleteMessage
+              - sqs:GetQueueAttributes
+            Resource: !GetAtt RouterQueue.Arn
+        - Statement:
+          Effect: Allow
+          Action:
+            - states:StartExecution
+            - states:DescribeExecution
+          Resource: !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:AgentStepFunction"
+
+Outputs:
+
+  RouterAgentFunction:
+    Description: "Router Agent Lambda Function ARN"
+    Value: !GetAtt RouterAgentFunction.Arn
+
+  RouterAgentFunctionIamRole:
+    Description: "IAM Role for Router Agent Lambda Function"
+    Value: !GetAtt RouterAgentFunctionRole.Arn
