@@ -38,7 +38,7 @@ Resources:
       MessageRetentionPeriod: 1209600  # Retain messages for 14 days
 
   # Lambda Function
-  RouteAgentrFunction:
+  RouteAgentFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: router/
