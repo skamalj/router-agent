@@ -55,7 +55,7 @@ Resources:
           MSG_HISTORY_TO_KEEP: 20
           DELETE_TRIGGER_COUNT: 30
           STEP_FUNCTION_ARN: !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:AgentStepFunction"
-          ROUTER_QUEUE_URL: !Ref LokiToJarvisQueue
+          ROUTER_QUEUE_URL: !Ref RouterQueue
           API_GW_URL: !Sub "{{resolve:secretsmanager:${ApiGWEndpoint}}}"
           API_GW_KEY: !Sub "{{resolve:secretsmanager:${ApiGWKey}}}"
       Events:
