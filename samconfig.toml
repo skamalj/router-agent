@@ -1,0 +1,9 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "router-agent"
+resolve_s3 = true
+s3_prefix = "router-agent"
+region = "ap-south-1"
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "ApiGWKey=\"ApiGWKey\" ApiGWEndpoint=\"ApiGWEndpoint\""
+image_repositories = []

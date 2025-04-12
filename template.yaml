@@ -43,7 +43,7 @@ Resources:
     Properties:
       CodeUri: router/
       Handler: app.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.10
       MemorySize: 512
       Timeout: 60
       Architectures:
