@@ -103,7 +103,9 @@ def lambda_handler(event, context):
         }
 
         config = {"configurable": {"thread_id": profile_id}}
-        nextagent = app.invoke(input_message, config)
+        response = app.invoke(input_message, config)
+        nextagent = response["messages"][-1].content
+        
         print(f"Next agent: {nextagent}")
         response = {
             "nextagent": nextagent,
