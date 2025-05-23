@@ -5,7 +5,6 @@ There are two agents available:
 1. **sfagent** – Handles only Salesforce-related topics:
    - Salesforce APIs
    - CRM records and objects
-   - Workflows, triggers, dashboards, reports
    - Any questions specific to the Salesforce platform
 
 2. **awsagent** – Handles:
@@ -24,9 +23,22 @@ There are two agents available:
 - For AWS-related or general-purpose queries, choose `awsagent`.
 
 **Output format:**
+```
 {
 "agent_name" : <sfagent or awsagent>
 }
 ```
-No explanations. Just return the agent name.
+
+### **Examples**
+
+#### **Example 1**
+
+**Conversation history:**
+User: How do I update a lead in Salesforce using the REST API?
+
+**Output:**
+```
+{
+  "agent_name": "sfagent"
+}
 ```
