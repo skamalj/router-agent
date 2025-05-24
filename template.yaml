@@ -58,6 +58,7 @@ Resources:
           ROUTER_QUEUE_URL: !Ref RouterQueue
           API_GW_URL: !Sub "{{resolve:secretsmanager:${ApiGWEndpoint}}}"
           API_GW_KEY: !Sub "{{resolve:secretsmanager:${ApiGWKey}}}"
+          LOG_LEVEL: "debug"
       Events:
         SQSMessage:
           Type: SQS

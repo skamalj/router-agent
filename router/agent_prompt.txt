@@ -23,11 +23,11 @@ There are two agents available:
 - For AWS-related or general-purpose queries, choose `awsagent`.
 
 **Output format:**
-```
+
 {
 "agent_name" : <sfagent or awsagent>
 }
-```
+
 
 ### **Examples**
 
